@@ -67,9 +67,6 @@ Instagram
             expected = [
                 target / "README.md",
                 target / "docs" / "project-spec.md",
-                target / ".planning" / "PROJECT.md",
-                target / ".planning" / "ROADMAP.md",
-                target / ".planning" / "STATE.md",
                 target / "content" / "posts" / ".gitkeep",
             ]
             self.assertFalse(result.dry_run)

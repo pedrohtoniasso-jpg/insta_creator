@@ -2,7 +2,7 @@
 name: insta-creator
 description: Use when turning a selected Instagram idea into a complete approval-ready package with hidden orchestration, stage validation, rendered card images, and final caption.
 version: 1.1.0
-author: Hermes Agent
+author: Pedro Toniazzo
 license: MIT
 metadata:
   hermes:
@@ -18,6 +18,7 @@ This skill is the single execution entrypoint for the Insta Creator production p
 
 The workflow runs end-to-end without asking the user for intermediate approvals. The only human approval point is the final payload: caption + rendered card images.
 When delivering the approval payload in chat, send the rendered card images as native media attachments and present the caption in a copy-friendly code block so the user can paste it directly.
+Do not replace that approval payload with slide-by-slide descriptions, card JSON, brief text, or audit notes unless the user explicitly asks to inspect internals.
 
 ## When to Use
 
@@ -37,6 +38,7 @@ Do not use this skill for:
 - Do not expose brief, narrative, card JSON, or audit drafts unless the user explicitly asks.
 - Do not stop at a textual outline when the user asks for cards; cards means generated visual assets.
 - Do not request approval until caption and rendered card images exist and have been audited.
+- Do not schedule publication or create a publish cron before that specific post package is explicitly approved.
 
 ## Workflow
 
@@ -55,6 +57,7 @@ Do not use this skill for:
 7. Run the final package audit.
 8. Assemble the deterministic post folder.
 9. Deliver only the final user-facing approval payload: caption + rendered card images.
+10. Wait for explicit approval or revision before scheduling, publishing, or moving to the next planned post.
 
 ## Carousel narrative standard
 
@@ -107,6 +110,8 @@ If a project requires a fixed template, load that project’s visual template or
 3. **Treating cards as prose.** Cards must become rendered images before approval.
 4. **Ignoring project visual rules.** Brand behavior belongs in the project spec and must be applied before image rendering.
 5. **Assembling approval too early.** Approval only happens after artifacts and images exist and pass audit.
+6. **Sending internals instead of the approval payload.** The approval message is cards + caption, not slide descriptions.
+7. **Batching publication before approvals.** Each post must be approved before scheduling or publishing.
 
 ## Verification Checklist
 
@@ -119,6 +124,7 @@ If a project requires a fixed template, load that project’s visual template or
 - [ ] Visual audit passed against project spec.
 - [ ] Final approval payload contains caption + images only.
 - [ ] Post folder is deterministic and traceable.
+- [ ] Publication/scheduling remains blocked until this package is explicitly approved.
 
 ## Reference material
 

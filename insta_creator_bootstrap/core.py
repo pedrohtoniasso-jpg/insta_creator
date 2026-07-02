@@ -180,7 +180,7 @@ def build_plan(
         actions.append(BootstrapAction(path=path, description=description, content=content))
 
     # Directory scaffold
-    for directory in [target, target / "docs", target / "content", target / "content" / "posts", target / ".planning"]:
+    for directory in [target, target / "docs", target / "content", target / "content" / "posts"]:
         if not directory.exists():
             actions.append(
                 BootstrapAction(
@@ -197,9 +197,6 @@ def build_plan(
         "Create or refresh the project spec template",
         "project_spec.md",
     )
-    add(target / ".planning" / "PROJECT.md", "Seed project planning doc", "planning_project.md")
-    add(target / ".planning" / "ROADMAP.md", "Seed roadmap doc", "planning_roadmap.md")
-    add(target / ".planning" / "STATE.md", "Seed planning state doc", "planning_state.md")
     add(target / "content" / "posts" / ".gitkeep", "Keep the post storage folder in git", "gitkeep.txt")
 
     return tuple(actions)
@@ -259,9 +256,6 @@ def validate_bootstrap_environment(target: str | Path, project_spec_path: str | 
     expected_paths: Sequence[Path] = [
         target_path / "README.md",
         spec_path,
-        target_path / ".planning" / "PROJECT.md",
-        target_path / ".planning" / "ROADMAP.md",
-        target_path / ".planning" / "STATE.md",
         target_path / "content" / "posts",
     ]
 

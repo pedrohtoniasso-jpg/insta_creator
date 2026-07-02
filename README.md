@@ -1,24 +1,32 @@
 # Insta Creator System
 
-A reusable Instagram content creation system for Hermes Agent.
+A reusable Instagram content creation system for autonomous agents.
 
 It combines:
 - a shared bootstrap package for new environments
+- a reusable monthly planner with explicit approval gates
 - reusable content workflow skills for briefs, cards, captions, audits, and approval packages
 - project-specific spec loading and idea intake
 - approval-gated growth workflows
-- operational hardening and reproducibility checks
+- deterministic validation checks
 
 ## What this repository provides
 
 - `insta_creator_bootstrap`: a local Python package that can plan, apply, and validate a shared scaffold
+- a planner/queue flow for monthly calendars with per-post approval gates
 - a reusable skill suite for turning selected ideas into complete content packages
 - project documentation and contracts for storage, project specs, workflow boundaries, and audit checks
-- verification artifacts and hardening checks for deterministic reuse
+- verification artifacts for deterministic reuse
 
 ## Quick start
 
 ### 1) Set up a project scaffold
+
+Install locally in editable mode first:
+
+```bash
+python -m pip install -e .
+```
 
 ```bash
 python -m insta_creator_bootstrap --help
@@ -26,6 +34,18 @@ python -m insta_creator_bootstrap plan --target <dir>
 python -m insta_creator_bootstrap apply --target <dir>
 python -m insta_creator_bootstrap validate --target <dir>
 ```
+
+### 1.5) Plan a month of content
+
+```bash
+python -m insta_creator_bootstrap plan-month --project-spec <path> --month YYYY-MM --planner-profile <path>
+python -m insta_creator_bootstrap queue-from-plan --plan-json <plan.json> --approved-ids-json <ids.json>
+```
+
+Approval semantics:
+- `plan-month` produces a calendar for human approval.
+- `queue-from-plan` only selects items for production; it does **not** approve publication.
+- After the plan is approved, produce and approve one post at a time.
 
 ### 2) Fill the project spec
 
@@ -44,25 +64,14 @@ Use the project spec template created by the bootstrap and make sure the require
 - asset constraints
 - operational notes
 
-### 3) Connect the second brain
+### 3) Prepare project context
 
-Set the second brain path before running a new agent:
+Before running a new agent or workflow, make sure these inputs exist and are current:
 
-```bash
-export SECOND_BRAIN_PATH=/path/to/second-brain
-```
-
-Core files to read first:
-- `CODEX.md` — profile, working style, and sync rule
-- `HEARTBEAT.md` — operational triage for the current heartbeat
-- `PROPAGATION.md` — what to update when state changes
-- `memory/context/pendencias.md` — open work and closure criteria
-- `memory/context/deadlines.md` — time-sensitive items
-- `memory/context/people.md` — people and roles
-- `memory/context/business-context.md` — consolidated operating context
-- `memory/projects/_index.md` — project overview and next steps
-- `memory/projects/<project>.md` — project-specific notes
-- `memory/YYYY-MM-DD.md` — daily sync notes
+- the active `project-spec.md`
+- any brand visual template used by the renderer
+- the shortlist or approved plan item that should drive production
+- any external context source your team uses for project memory or business background
 
 ### 4) Run the shared content workflow
 
@@ -80,6 +89,7 @@ Useful references:
 - `docs/content-workflow-contract.md`
 - `docs/carousel-workflow-contract.md`
 - `docs/story-workflow-contract.md`
+- `docs/planner-workflow-contract.md`
 - `docs/insta-creator-system-spec.md`
 - `docs/project-integration.md`
 - `schemas/cards.schema.json`
@@ -95,7 +105,7 @@ Useful references:
 
 1. Discovery cron returns exactly 5 numbered ideas and persists them to `state/latest-shortlist/<project_id>.json`.
 2. User selects one idea by number or explicit theme.
-3. If the reply is only `1`-`5` or `Opção N`, resolve it from the persisted latest-shortlist state before production.
+3. If the reply is only `1`-`5` or a terse option reference, resolve it from the persisted latest-shortlist state before production.
 4. Cron discovery uses 5 numbered ideas; user reply is normalized into a selection handoff.
 5. Orchestrator reads the selected project spec, selected visual template, and trace context.
 6. Build the brief.
@@ -109,6 +119,7 @@ Useful references:
 14. Run final package audit.
 15. Assemble deterministic bundle.
 16. Send the approval payload: caption + rendered card images.
+17. Wait for explicit approval before scheduling/publication or before generating the next post from the monthly plan.
 
 The user should not receive internal stages unless they explicitly ask for them.
 
@@ -132,6 +143,8 @@ Rule of thumb:
 
 Use cron to automate discovery and follow-up queues. Production should begin only after a selection signal.
 
+Detailed prompt templates live in `docs/cron-templates.md`.
+
 Suggested schedules:
 
 - **Content ideas / trend intake**
@@ -143,6 +156,12 @@ Suggested schedules:
 - **Content production**
   - trigger: selected idea / explicit theme
   - purpose: generate the brief, narrative, cards JSON, caption, rendered images, audit, and approval payload
+  - rule: do one post at a time; wait for approval before generating the next planned post
+
+- **Publication**
+  - trigger: explicit approval of one specific post package
+  - purpose: publish only the already approved package
+  - rule: never create this schedule before that post is approved
 
 - **Growth actions**
   - schedule: `*/30 * * * *`
@@ -163,36 +182,15 @@ Notes:
 ## Verification
 
 - `python -m unittest discover -s tests -v`
-- `python scripts/phase5_hardening_check.py`
-
-## Agent routines
-
-### Hermes / Codex
-- Start by reading `CODEX.md`, `HEARTBEAT.md`, and `PROPAGATION.md`.
-- Check `memory/context/pendencias.md` before planning or creating anything new.
-- Update the matching memory file as soon as a state change happens.
-- Write a daily note in `memory/YYYY-MM-DD.md` when a session changes the operating picture.
-- Prefer concrete closures: action, owner, artifact, and completion criteria.
-- Use the second brain as the operational source of truth, not as a passive archive.
-
-### Zapia
-- Treat the second brain as the historical/context source for business, projects, and decisions.
-- Read the relevant project note before generating a new output.
-- Pull from `memory/projects/_index.md` and `memory/context/business-context.md` before making assumptions.
-- Keep canonical context in memory files; keep drafts and experiments separate.
-- Mirror important decisions back into the right note so the backup stays useful as a reference source.
-- Use the backup workspace as context supply, not as a place for ephemeral scratch-only work.
 
 ## Routine for a new agent
 
-1. Set `SECOND_BRAIN_PATH`.
-2. Read `CODEX.md`.
-3. Read `HEARTBEAT.md`.
-4. Read `PROPAGATION.md`.
-5. Check `memory/context/pendencias.md` and `memory/projects/_index.md`.
-6. Load the project spec before content generation.
-7. Use the orchestrator as the content-production entrypoint.
-8. Write state changes back to the correct memory file.
+1. Install the package and validate the scaffold.
+2. Load the active project spec before content generation.
+3. If a monthly plan exists, choose exactly one approved item for production.
+4. Use the orchestrator as the content-production entrypoint.
+5. Deliver only the approval payload to the human reviewer.
+6. Wait for explicit approval before publication or before moving to the next planned item.
 
 ## Notes
 

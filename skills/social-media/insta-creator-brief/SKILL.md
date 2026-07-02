@@ -2,7 +2,7 @@
 name: insta-creator-brief
 description: Use when turning an idea into a reusable content brief for the shared Instagram workflow. Captures the angle, audience, constraints, and traceability before downstream generation.
 version: 1.0.0
-author: Hermes Agent
+author: Pedro Toniazzo
 license: MIT
 metadata:
   hermes:

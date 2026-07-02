@@ -78,6 +78,8 @@ Fill it with the active project’s real rules before running content production
 ## Approval behavior
 - Approval channel: main channel
 - User approves only at the final package stage.
+- Monthly-plan approval does not approve individual post packages or publication.
+- After the plan is approved, produce and approve one post/story package at a time.
 - Visible approval payload:
   - final caption
   - rendered card images already created for the post

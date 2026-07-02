@@ -11,6 +11,8 @@ For Instagram Stories, also follow `docs/story-workflow-contract.md`. Story requ
 - The orchestrator is responsible for all production steps.
 - The user is not the orchestrator: do not ask for intermediate approval during production.
 - The only user approval point is the final package, after caption and rendered card images exist.
+- The approval payload must be the final caption plus rendered card images only, unless the user explicitly asks to inspect internals.
+- A plan approval does not authorize scheduling or publication; post-level approval is still required.
 
 ## Workflow order
 1. Load the selected project spec, selected visual template, and trace context.
@@ -29,6 +31,8 @@ For Instagram Stories, also follow `docs/story-workflow-contract.md`. Story requ
    - rendered card images as native media attachments
    - caption in a copy-friendly block the user can paste directly
    - carousel shorthand: caption + rendered card images
+10. Wait for explicit approval or revision.
+11. Only after explicit approval may the post move to scheduling or publication.
 
 ## Format selection rule
 
@@ -109,6 +113,7 @@ Each validation step must be question-driven, not a single pass/fail label.
 - Does `approval.md` summarize the checks and final decision state?
 - Is the user-facing approval payload only caption + images, not internal drafts?
 - Did any rejection/change request become a new checklist question or project-spec rule?
+- Is publication/scheduling still blocked until this specific package is approved?
 
 ## Shared artifact roles
 
@@ -137,6 +142,8 @@ The caption should keep a predictable structure that supports the same narrative
 ### `approval.md`
 The approval package summarizes the chosen direction, stage validations, visual audit, and final visible payload.
 
+It is an internal bundle artifact. When sending the user-facing approval message, do not paste `approval.md`, `brief.md`, `cards.json`, or slide-by-slide textual outlines unless the user explicitly asks for them.
+
 ## Traceability rules
 - Every artifact must reference the same post identifier.
 - The brief, cards, caption, images, and approval package must all point back to the originating idea.
@@ -147,3 +154,4 @@ The approval package summarizes the chosen direction, stage validations, visual 
 - Rendered images must exist before final approval.
 - The content package must contain all required files before approval.
 - The shared workflow remains generic; project-specific branding belongs in the project spec.
+- Publication scheduling must happen only after explicit approval of that post package.

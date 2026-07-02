@@ -2,7 +2,7 @@
 name: insta-creator-approval-package
 description: Use when assembling the final Instagram review bundle after brief, cards, caption, visual assets, and audits already exist.
 version: 1.1.0
-author: Hermes Agent
+author: Pedro Toniazzo
 license: MIT
 metadata:
   hermes:
@@ -44,6 +44,8 @@ The user-facing approval output should include only:
 - the final caption, preferably between backticks when delivered in chat
 - the rendered card images already created for the post
 
+Do not replace this with slide-by-slide prose, brief excerpts, JSON dumps, or audit checklists unless the user explicitly asks for them.
+
 Internal JSON, brief, traceability, and audit logs stay in the bundle unless the user asks to inspect them.
 
 ## Approval rules
@@ -52,9 +54,10 @@ Internal JSON, brief, traceability, and audit logs stay in the bundle unless the
 - Preserve the same post identifier in every artifact.
 - Include a concise summary of the chosen content direction.
 - Record stage checklist results in `approval.md`.
-- Make the reviewer’s decision path obvious.
+- Keep the reviewer’s decision path obvious.
 - Keep any reply drafts in the bundle rather than as loose files.
 - Do not present textual card outlines as “cards”; rendered images are required.
+- Do not create a publication schedule from this package until the user explicitly approves it.
 
 ## Common Pitfalls
 
@@ -73,3 +76,4 @@ Internal JSON, brief, traceability, and audit logs stay in the bundle unless the
 - [ ] The visible approval payload is caption + images.
 - [ ] Reply drafts are included when relevant.
 - [ ] The deterministic folder layout is respected.
+- [ ] Publication remains blocked until explicit approval.

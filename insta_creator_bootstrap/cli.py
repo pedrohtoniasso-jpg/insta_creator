@@ -18,6 +18,13 @@ from .selection_state import (
     save_latest_shortlist,
 )
 from .integration import content_run_input_to_prompt
+from .planner import (
+    build_monthly_plan,
+    build_production_queue,
+    plan_month_to_dict,
+    queue_to_dict,
+    read_json_source,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -75,11 +82,35 @@ def build_parser() -> argparse.ArgumentParser:
     shortlist_resolve.add_argument("--root", default=".")
     shortlist_resolve.add_argument("--prompt", action="store_true", help="Print the orchestrator prompt instead of JSON")
 
+    plan_month = subparsers.add_parser("plan-month", help="Build the monthly editorial plan for a project")
+    plan_month.add_argument("--project-spec", required=True, help="Selected project spec Markdown path")
+    plan_month.add_argument("--month", required=True, help="Target month in YYYY-MM format")
+    plan_month.add_argument("--project-id", help="Override project identifier")
+    plan_month.add_argument("--planner-profile", help="Optional project planner profile Markdown path")
+    plan_month.add_argument("--timezone", default="America/Sao_Paulo", help="Timezone label for the plan")
+    plan_month.add_argument("--scheduled-json", help="JSON file or inline JSON with already scheduled items")
+    plan_month.add_argument("--history-json", help="JSON file or inline JSON with recent history items")
+    plan_month.add_argument("--special-dates-json", help="JSON file or inline JSON with special date watch slots")
+    plan_month.add_argument("--output", help="Optional path to write the plan JSON")
+
+    queue_from_plan = subparsers.add_parser("queue-from-plan", help="Convert an approved monthly plan into a production queue")
+    queue_from_plan.add_argument("--plan-json", required=True, help="Plan JSON file or inline JSON")
+    queue_from_plan.add_argument("--approved-ids-json", help="JSON array of approved item IDs")
+    queue_from_plan.add_argument("--output", help="Optional path to write the queue JSON")
+
     return parser
 
 
 def _print_actions(data: dict[str, object]) -> None:
     print(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def _load_json_payload(source: str) -> object:
+    text = source.strip()
+    if text.startswith("[") or text.startswith("{"):
+        return json.loads(text)
+    path = Path(text).expanduser()
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -161,6 +192,48 @@ def main(argv: Sequence[str] | None = None) -> int:
                     })
                 return 0
         except (BootstrapValidationError, json.JSONDecodeError) as exc:
+            print(str(exc))
+            return 1
+
+    if args.command == "plan-month":
+        try:
+            plan = build_monthly_plan(
+                project_spec_path=args.project_spec,
+                month=args.month,
+                project_id=args.project_id,
+                planner_profile_path=args.planner_profile,
+                timezone=args.timezone,
+                scheduled_items=read_json_source(args.scheduled_json),
+                history_items=read_json_source(args.history_json),
+                special_dates=read_json_source(args.special_dates_json),
+            )
+            payload = plan_month_to_dict(plan)
+            if args.output:
+                Path(args.output).expanduser().write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            _print_actions(payload)
+            return 0
+        except (BootstrapValidationError, json.JSONDecodeError, OSError) as exc:
+            print(str(exc))
+            return 1
+
+    if args.command == "queue-from-plan":
+        try:
+            plan_payload = _load_json_payload(args.plan_json)
+            if not isinstance(plan_payload, dict):
+                raise BootstrapValidationError("--plan-json must contain a JSON object.")
+            approved_ids: list[str] = []
+            if args.approved_ids_json:
+                approved_payload = _load_json_payload(args.approved_ids_json)
+                if not isinstance(approved_payload, list):
+                    raise BootstrapValidationError("--approved-ids-json must be a JSON array.")
+                approved_ids = [str(item) for item in approved_payload if str(item).strip()]
+            queue = build_production_queue(plan_payload, approved_item_ids=approved_ids)
+            payload = queue_to_dict(queue)
+            if args.output:
+                Path(args.output).expanduser().write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            _print_actions(payload)
+            return 0
+        except (BootstrapValidationError, json.JSONDecodeError, OSError) as exc:
             print(str(exc))
             return 1
 

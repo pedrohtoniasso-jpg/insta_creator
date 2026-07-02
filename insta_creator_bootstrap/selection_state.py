@@ -132,7 +132,7 @@ def resolve_selection_reply(
     project_id: str,
     root: str | Path = ".",
 ) -> ContentRunInput:
-    """Resolve a terse Telegram reply (`1`-`5` or `Opção 5`) into a ContentRunInput."""
+    """Resolve a terse chat reply (`1`-`5` or `Option 5`) into a ContentRunInput."""
 
     selected_option = parse_selection_reply(reply)
     if selected_option is None:

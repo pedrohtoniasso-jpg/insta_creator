@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "insta-creator"
 version = "0.1.0"
-description = "Reusable Instagram content creation system and bootstrap package for Hermes Agent"
+description = "Reusable Instagram content creation system and bootstrap package for autonomous agents"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
   { name = "Pedro Toniazzo" }
 ]
 license = { text = "MIT" }
-keywords = ["instagram", "hermes", "content", "bootstrap", "social-media"]
+keywords = ["instagram", "agents", "content", "bootstrap", "social-media"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",

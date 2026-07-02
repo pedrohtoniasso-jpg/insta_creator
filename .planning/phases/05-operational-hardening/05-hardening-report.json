@@ -1,7 +1,0 @@
-{
-  "bootstrap_apply_returncode": 0,
-  "bootstrap_validate_returncode": 0,
-  "bootstrap_validate_stdout": "{\n  \"target\": \"/tmp/tmpcc7e_x15\",\n  \"project_spec\": \"/tmp/tmpcc7e_x15/docs/project-spec.md\",\n  \"status\": \"ready\"\n}",
-  "sample_post_dir": "/tmp/tmpcc7e_x15/content/posts/2026.06.15 - Hardening demo",
-  "status": "pass"
-}

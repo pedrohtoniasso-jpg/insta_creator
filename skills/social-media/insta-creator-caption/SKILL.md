@@ -2,7 +2,7 @@
 name: insta-creator-caption
 description: Use when turning a brief into a reusable caption for the shared Instagram workflow. Produces predictable structure with controlled style variation and CTA/hashtag handling.
 version: 1.0.0
-author: Hermes Agent
+author: Pedro Toniazzo
 license: MIT
 metadata:
   hermes:

@@ -2,7 +2,7 @@
 name: insta-creator-stories
 description: Use when turning a brief into structured Instagram Story frames for the shared workflow. Validates frame order, 9:16 composition, and concise copy.
 version: 1.0.0
-author: Hermes Agent
+author: Pedro Toniazzo
 license: MIT
 metadata:
   hermes:

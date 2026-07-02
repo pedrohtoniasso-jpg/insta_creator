@@ -2,7 +2,7 @@
 name: insta-creator-cards
 description: Use when turning a brief into structured carousel cards JSON for the shared Instagram workflow. Validates slide order, card roles, and copy structure.
 version: 1.0.0
-author: Hermes Agent
+author: Pedro Toniazzo
 license: MIT
 metadata:
   hermes:
